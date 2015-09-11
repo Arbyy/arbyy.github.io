@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>Mandelbrot Set</title>
+    <script src="math.min.js"></script>
+  </head>
+  <body>
+    <canvas id="weeny" width=1000 height=1000>
+      <p>Get a decent browser you weeny</p>
+    </canvas>
+    <script>
+      var canvas = document.getElementById("weeny");
+      var ctx = canvas.getContext('2d');
+
+      function point(x, y){ ctx.fillRect(x,y,1,1); }
+      function positive(n){ if(n < 0){return -n;} else {return n;}}
+
+      var z = 0;
+      var bailout = 2;
+      var size = 1000;
+      var iterations = 100;
+      var mandsizeminX = -2;
+      var mandsizemaxX = 2;
+      var mandsizeminY = -2;
+      var mandsizemaxY = 2;
+      var mandsizeorigin = 0;
+      var diffX = (mandsizemaxX-mandsizeminX)/size;
+      var diffY = (mandsizemaxY-mandsizeminY)/size;
+
+      var fClickPointX = 0;
+      var fClickPointY = 0;
+      var sClickPointX = 0;
+      var sClickPointY = 0;
+      var firstClick = true;
+
+      var x = mandsizeminX;
+      var I = 0;
+
+      function update() {
+        if (x > mandsizemaxX) { return; }
+
+        for (var y = mandsizeminY; y <= mandsizemaxY; y = y+diffY) {
+          var c = math.complex(x, y);
+          var z = 0;
+          for (var i = 1; i <= iterations; i++) {
+            z = math.add(math.pow(z, 2), c);
+            if (math.abs(z) > bailout) {
+              I = i;
+              break;
+            }
+          }
+          var degree = I/50;
+          var heat = (250*degree);
+
+    		  ctx.fillStyle = "rgb("+heat+",0,"+heat+")";
+          point(math.floor((x-mandsizeminX)/diffX), math.floor((y-mandsizeminY)/diffY));
+
+          if (math.abs(z) < bailout) {
+            ctx.fillStyle = "#000000";
+            point(math.floor((x-mandsizeminX)/diffX), math.floor((y-mandsizeminY)/diffY));
+          }
+        }
+
+        x = x+diffX;
+
+        requestAnimationFrame(update);
+      }
+
+      canvas.addEventListener("mousedown", function(e){
+        if (firstClick) {
+          firstClick = false;
+          fClickPointX = e.offsetX;
+          fClickPointY = e.offsetY;
+        } else {
+          firstClick = true;
+          sClickPointX = e.offsetX;
+          sClickPointY = e.offsetY;
+
+          var oldminX = mandsizeminX;
+          var oldminY = mandsizeminY;
+
+          mandsizeminX = (fClickPointX*diffX)-positive(oldminX);
+          mandsizemaxX = (sClickPointX*diffX)-positive(oldminX);
+          mandsizeminY = (fClickPointY*diffY)-positive(oldminY);
+          mandsizemaxY = (sClickPointY*diffY)-positive(oldminY);
+
+          diffX = (mandsizemaxX-mandsizeminX)/size;
+          diffY = (mandsizemaxY-mandsizeminY)/size;
+
+          z = 0;
+          x = mandsizeminX;
+          I = 0;
+
+          requestAnimationFrame(update);
+        }
+      });
+
+      requestAnimationFrame(update);
+    </script>
+  </body>
+</html>
