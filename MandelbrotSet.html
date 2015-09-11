@@ -4,11 +4,38 @@
   <head>
     <title>Mandelbrot Set</title>
     <script src="math.min.js"></script>
+
+    <style>
+      #weeny {
+        margin-top: 10px;
+      }
+
+      input, button {
+        display: block;
+      }
+
+      p {
+        margin: 0;
+      }
+
+      button {
+        margin-top: 5px;
+      }
+    </style>
   </head>
   <body>
+    <p>Iterations:</p>
+    <input type="number" id="iterationsval">
+    <br>
+    <p>Color Degree (higher is brighter):</p>
+    <input type="number" id="colorval">
+
+    <button id="regen" onclick="Regen()">Regenerate</button>
+
     <canvas id="weeny" width=1000 height=1000>
       <p>Get a decent browser you weeny</p>
     </canvas>
+
     <script>
       var canvas = document.getElementById("weeny");
       var ctx = canvas.getContext('2d');
@@ -25,8 +52,12 @@
       var mandsizeminY = -2;
       var mandsizemaxY = 2;
       var mandsizeorigin = 0;
+      var colortolerance = 50;
       var diffX = (mandsizemaxX-mandsizeminX)/size;
       var diffY = (mandsizemaxY-mandsizeminY)/size;
+
+      document.getElementById("iterationsval").value = iterations;
+      document.getElementById("colorval").value = 250/colortolerance;
 
       var fClickPointX = 0;
       var fClickPointY = 0;
@@ -50,7 +81,7 @@
               break;
             }
           }
-          var degree = I/50;
+          var degree = I/colortolerance;
           var heat = (250*degree);
 
     		  ctx.fillStyle = "rgb("+heat+",0,"+heat+")";
@@ -63,6 +94,17 @@
         }
 
         x = x+diffX;
+
+        requestAnimationFrame(update);
+      }
+
+      function Regen() {
+        iterations = document.getElementById("iterationsval").value;
+        colortolerance = 250/(document.getElementById("colorval").value);
+
+        z = 0;
+        x = mandsizeminX;
+        I = 0;
 
         requestAnimationFrame(update);
       }
