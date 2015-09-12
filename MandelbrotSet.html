@@ -6,12 +6,23 @@
     <script src="math.min.js"></script>
 
     <style>
-      #weeny {
-        margin-top: 10px;
+      body {
+        background-color: #95a5a6;
       }
 
-      input, button {
-        display: block;
+      #wrapper {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        overflow: hidden;
+      }
+
+      #weeny {
+        margin: 0;
+        padding: 0;
+        margin-top: 10px;
+        float: left;
+        background-color: #000000;
       }
 
       p {
@@ -21,24 +32,52 @@
       button {
         margin-top: 5px;
       }
+
+      #settings {
+        overflow: hidden;
+        padding-left: 10px;
+        margin-top: 10px;
+      }
     </style>
   </head>
   <body>
-    <p>Iterations:</p>
-    <input type="number" id="iterationsval">
-    <br>
-    <p>Color Degree (higher is brighter):</p>
-    <input type="number" id="colorval">
+    <div id="wrapper">
+      <canvas id="weeny" width=1000 height=1000>
+        <p>Get a decent browser you weeny</p>
+      </canvas>
 
-    <button id="regen" onclick="Regen()">Regenerate</button>
-
-    <canvas id="weeny" width=1000 height=1000>
-      <p>Get a decent browser you weeny</p>
-    </canvas>
+      <div id="settings">
+        <p>Iterations:</p>
+        <input type="number" id="iterationsval">
+        <br><br>
+        <p>Color Degree (higher is brighter):</p>
+        <input type="number" id="colorval">
+        <br><br>
+        <button id="regen" onclick="Regen()">Regenerate</button>
+      </div>
+    </div>
 
     <script>
+      // Code from http://stackoverflow.com/questions/7812514/drawing-a-dot-on-html5-canvas
       var canvas = document.getElementById("weeny");
-      var ctx = canvas.getContext('2d');
+      var canvasWidth = canvas.width;
+      var canvasHeight = canvas.height;
+      var ctx = canvas.getContext("2d");
+      var canvasData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
+
+      function drawPixel (x, y, r, g, b, a) {
+        var index = (x + y * canvasWidth) * 4;
+
+        canvasData.data[index + 0] = r;
+        canvasData.data[index + 1] = g;
+        canvasData.data[index + 2] = b;
+        canvasData.data[index + 3] = a;
+      }
+
+      function updateCanvas() {
+        ctx.putImageData(canvasData, 0, 0);
+      }
+      // End of ripped code
 
       function point(x, y){ ctx.fillRect(x,y,1,1); }
       function positive(n){ if(n < 0){return -n;} else {return n;}}
@@ -55,6 +94,7 @@
       var colortolerance = 50;
       var diffX = (mandsizemaxX-mandsizeminX)/size;
       var diffY = (mandsizemaxY-mandsizeminY)/size;
+      var mandData = [[]]; // 2d array
 
       document.getElementById("iterationsval").value = iterations;
       document.getElementById("colorval").value = 250/colortolerance;
@@ -65,11 +105,13 @@
       var sClickPointY = 0;
       var firstClick = true;
 
+      var intervalID = 0;
+
       var x = mandsizeminX;
       var I = 0;
 
       function update() {
-        if (x > mandsizemaxX) { return; }
+        if (x > mandsizemaxX) { clearInterval(intervalID); }
 
         for (var y = mandsizeminY; y <= mandsizemaxY; y = y+diffY) {
           var c = math.complex(x, y);
@@ -94,8 +136,6 @@
         }
 
         x = x+diffX;
-
-        requestAnimationFrame(update);
       }
 
       function Regen() {
@@ -106,7 +146,7 @@
         x = mandsizeminX;
         I = 0;
 
-        requestAnimationFrame(update);
+        intervalID = setInterval(update, 0);
       }
 
       canvas.addEventListener("mousedown", function(e){
@@ -134,11 +174,11 @@
           x = mandsizeminX;
           I = 0;
 
-          requestAnimationFrame(update);
+          intervalID = setInterval(update, 0);
         }
       });
 
-      requestAnimationFrame(update);
+      intervalID = setInterval(update, 0);
     </script>
   </body>
 </html>
