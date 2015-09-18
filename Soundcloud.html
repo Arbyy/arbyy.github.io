@@ -6,21 +6,41 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 	  </head>
 	<body>
-		<p>Playing some sound? (hopefully)</p>
-		<a id="stop" href="">STOP PLEASE DEAR LORD</a>
+		<p>Soundcloud music player. (Hopefully)</p>
+		<input type="url" id="MediaURL"></input><br>
+		<a id="play" href="">PLAY</a><br>
+		<a id="stop" href="">STOP</a>
 		<script>
-			var client_id = 'CLIENT_ID_HERE';
+			var client_id = '6b1b96afeca52a85029a7126bb8779dc';
 			
-			var context = new AudioContext(),
-				audio   = new Audio(),
-				source,
-				url     = "http://api.soundcloud.com/tracks/224166244/stream"+"?client_id="+client_id;
+			SC.initialize({
+				client_id: client_id
+			});
 			
-			audio.src = url;
-			audio.crossOrigin = "anonymous";
-			source = context.createMediaElementSource(audio);
-			source.connect(context.destination);
-			source.mediaElement.play();
+			document.getElementById("MediaURL").value = "https://soundcloud.com/muse/undisclosed-desires";
+			
+			var context, audio, source;
+			
+			function playAudio(url) {
+				context = new AudioContext();
+				audio   = new Audio();
+				
+				audio.src = url;
+				audio.crossOrigin = "anonymous";
+				source = context.createMediaElementSource(audio);
+				source.connect(context.destination);
+				source.mediaElement.play();
+			}
+			
+			$("#play").click(function(e) {
+				e.preventDefault();
+				var input_url = document.getElementById("MediaURL").value;
+				var stream_url;
+				SC.get("/resolve", {url: input_url}, function(data) {
+					stream_url = data.stream_url+"?client_id"+client_id;
+				});
+				playAudio(stream_url);
+			});
 			
 			$("#stop").click(function(e) {
 				e.preventDefault();
