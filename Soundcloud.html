@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+
+<html>
+ 	<head>
+ 		<script src="//connect.soundcloud.com/sdk.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	  </head>
+	<body>
+		<p>Playing some sound? (hopefully)</p>
+		<a id="stop" href="">STOP PLEASE DEAR LORD</a>
+		<script>
+			var client_id = 'CLIENT_ID_HERE';
+			
+			var context = new AudioContext(),
+				audio   = new Audio(),
+				source,
+				url     = "http://api.soundcloud.com/tracks/224166244/stream"+"?client_id="+client_id;
+			
+			audio.src = url;
+			audio.crossOrigin = "anonymous";
+			source = context.createMediaElementSource(audio);
+			source.connect(context.destination);
+			source.mediaElement.play();
+			
+			$("#stop").click(function(e) {
+				e.preventDefault();
+				source.mediaElement.pause();
+			});
+		</script>
+	</body>
+</html>
