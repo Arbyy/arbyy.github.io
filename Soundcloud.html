@@ -35,11 +35,9 @@
 			$("#play").click(function(e) {
 				e.preventDefault();
 				var input_url = document.getElementById("MediaURL").value;
-				var stream_url;
 				SC.get("/resolve", {url: input_url}, function(data) {
-					stream_url = data.stream_url+"?client_id"+client_id;
+					playAudio(data.stream_url+"?client_id="+client_id);
 				});
-				playAudio(stream_url);
 			});
 			
 			$("#stop").click(function(e) {
