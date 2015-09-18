@@ -79,6 +79,14 @@
       }
       // End of ripped code
 
+      function getMousePos(canvas, evt) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+          x: evt.clientX - rect.left,
+          y: evt.clientY - rect.top
+        };
+      }
+
       function point(x, y){ ctx.fillRect(x,y,1,1); }
       function positive(n){ if(n < 0){return -n;} else {return n;}}
 
@@ -126,15 +134,16 @@
           var degree = I/colortolerance;
           var heat = (250*degree);
 
-    		  ctx.fillStyle = "rgb("+heat+",0,"+heat+")";
-          point(math.floor((x-mandsizeminX)/diffX), math.floor((y-mandsizeminY)/diffY));
+					//ctx.fillStyle = "rgb("+heat+",0,"+heat+")";
+          drawPixel(math.floor((x-mandsizeminX)/diffX), math.floor((y-mandsizeminY)/diffY), heat, 0, heat, 255);
 
           if (math.abs(z) < bailout) {
-            ctx.fillStyle = "#000000";
-            point(math.floor((x-mandsizeminX)/diffX), math.floor((y-mandsizeminY)/diffY));
+            //ctx.fillStyle = "#000000";
+            drawPixel(math.floor((x-mandsizeminX)/diffX), math.floor((y-mandsizeminY)/diffY), 0, 0, 0, 255);
           }
         }
 
+				updateCanvas();
         x = x+diffX;
       }
 
@@ -175,6 +184,16 @@
           I = 0;
 
           intervalID = setInterval(update, 0);
+        }
+      });
+
+      canvas.addEventListener("mousemove", function(e){
+        if(!firstClick){
+          ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+          updateCanvas();
+					ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+          var mousePos = getMousePos(canvas, e);
+					ctx.fillRect(fClickPointX, fClickPointY, mousePos.x - fClickPointX, mousePos.y - fClickPointY);
         }
       });
 
